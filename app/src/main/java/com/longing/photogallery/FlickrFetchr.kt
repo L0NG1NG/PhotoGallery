@@ -1,6 +1,5 @@
 package com.longing.photogallery
 
-import android.app.DownloadManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
@@ -35,12 +34,18 @@ class FlickrFetchr {
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
 
-    fun fetchPhotos(): LiveData<List<GalleryItem>> {
-        return fetchPhotoMetadata(flickrApi.fetchPhotos())
+    fun fetchPhotoRequest(): Call<FlickrResponse> {
+        return flickrApi.fetchPhotos()
     }
 
+
+    fun fetchPhotos(): LiveData<List<GalleryItem>> {
+        return fetchPhotoMetadata(fetchPhotoRequest())
+    }
+
+    fun searchPhotoRequest(query: String): Call<FlickrResponse> = flickrApi.searchPhotos(query)
     fun searchPhotos(query: String): LiveData<List<GalleryItem>> {
-        return fetchPhotoMetadata(flickrApi.searchPhotos(query))
+        return fetchPhotoMetadata(searchPhotoRequest(query))
     }
 
     private fun fetchPhotoMetadata(flickrRequest: Call<FlickrResponse>)

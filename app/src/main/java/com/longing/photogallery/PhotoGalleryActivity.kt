@@ -1,5 +1,7 @@
 package com.longing.photogallery
 
+import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.StrictMode
@@ -16,6 +18,12 @@ class PhotoGalleryActivity : AppCompatActivity() {
                 .add(R.id.fragmentContainer, PhotoGalleryFragment.newInstance())
                 .commit()
 
+        }
+    }
+
+    companion object {
+        fun newInstance(context: Context): Intent {
+            return Intent(context, PhotoGalleryActivity::class.java)
         }
     }
 }
