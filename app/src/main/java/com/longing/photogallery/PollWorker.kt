@@ -1,8 +1,10 @@
 package com.longing.photogallery
 
+import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -48,9 +50,28 @@ class PollWorker(val context: Context, workerParameters: WorkerParameters) :
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build()
-            val notificationManage = NotificationManagerCompat.from(context)
-            notificationManage.notify(0, notification)
+
+            showBackgroundNotification(0, notification)
         }
         return Result.success()
+    }
+
+    private fun showBackgroundNotification(
+        requestCode: Int,
+        notification: Notification
+    ) {
+        val intent = Intent(ACTION_SHOW_NOTIFICATION).apply {
+            putExtra(REQUEST_CODE, requestCode)
+            putExtra(NOTIFICATION, notification)
+        }
+        context.sendOrderedBroadcast(intent, PERM_PRIVATE)
+
+    }
+
+    companion object {
+        const val ACTION_SHOW_NOTIFICATION = "com.loging.photogallery.SHOW_NOTIFICATION"
+        const val PERM_PRIVATE = "com.longing.photogallery.PRIVATE"
+        const val REQUEST_CODE = "REQUEST_CODE"
+        const val NOTIFICATION = "NOTIFICATION"
     }
 }
