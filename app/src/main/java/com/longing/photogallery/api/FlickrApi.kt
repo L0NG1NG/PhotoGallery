@@ -1,9 +1,10 @@
 package com.longing.photogallery.api
 
 import com.longing.photogallery.BuildConfig
-import com.longing.photogallery.FlickrResponse
+import com.longing.photogallery.PhotoResponse
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface FlickrApi {
     //真长 yue~
@@ -14,5 +15,5 @@ interface FlickrApi {
                 "&nojsoncallback=1" +
                 "&extras=url_s"
     )
-    fun fetchPhotos(): Call<FlickrResponse>
+    suspend fun fetchPhotos(@Query("page") page: Int): PhotoResponse
 }
