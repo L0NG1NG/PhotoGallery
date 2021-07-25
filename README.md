@@ -11,7 +11,7 @@ ThumbanilDowner用了ViewHolder来标识应该把下载的图片给它来显示�
 而LruCache应该用图片的url当作Key,Bitmap当作Value，每次ThumbanilDowner要下载的时候就把目标图片u的url，
 给到LruCache里去找Bitmp,null的话就去网络下载
 
-private fun handleRequest(target: T) {
+	private fun handleRequest(target: T) {
 	//target指代的是要显示图片的ViewHolder
         val url = requestMap[target] ?: return
 
