@@ -6,16 +6,17 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.util.Log
+import android.util.LruCache
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import org.jetbrains.annotations.NotNull
 import java.util.concurrent.ConcurrentHashMap
 
 private const val TAG = "ThumbnailDownloader"
 private const val MESSAGE_DOWNLOAD = 0
 
 class ThumbnailDownloader<in T>(
+
     private val responseHandler: Handler,
     private val onThumbnailDownloaded: (T, Bitmap) -> Unit
 ) : HandlerThread(TAG), LifecycleObserver {
@@ -50,6 +51,8 @@ class ThumbnailDownloader<in T>(
     private lateinit var requestHandler: Handler
     private val requestMap = ConcurrentHashMap<T, String>()
     private val flickrFetchr = FlickrFetchr()
+    private val bitmapLruCache = LruCache<String, Bitmap>(21)
+
 
     @SuppressLint("HandlerLeak")
     override fun onLooperPrepared() {
@@ -82,7 +85,9 @@ class ThumbnailDownloader<in T>(
 
     private fun handleRequest(target: T) {
         val url = requestMap[target] ?: return
-        val bitmap = flickrFetchr.fetchPhoto(url) ?: return
+
+        val bitmap = bitmapLruCache.get(url)
+            ?: flickrFetchr.fetchPhoto(url) ?: return
 
         responseHandler.post(Runnable {
             if (requestMap[target] != url || hasQuit) {
@@ -93,6 +98,10 @@ class ThumbnailDownloader<in T>(
 
         })
 
+        bitmapLruCache.put(url, bitmap)
+        Log.d(TAG, "handleRequest: -->${bitmapLruCache.size()}")
+
     }
+
 
 }
