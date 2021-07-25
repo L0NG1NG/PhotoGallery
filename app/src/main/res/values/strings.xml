@@ -2,4 +2,7 @@
     <string name="app_name">PhotoGallery</string>
     <string name="search">Search</string>
     <string name="clear_search">Clear Search</string>
+
+    <string name="loading_tips">Loading…</string>
+    <string name="searching_tips">Searching…</string>
 </resources>

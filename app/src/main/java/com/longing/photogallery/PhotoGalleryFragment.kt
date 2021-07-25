@@ -1,5 +1,6 @@
 package com.longing.photogallery;
 
+import android.content.Context
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -7,7 +8,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -15,12 +18,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
+
 private const val TAG = "PhotoGalleryFragment"
 
 class PhotoGalleryFragment : Fragment() {
     private lateinit var photoGalleryViewModel: PhotoGalleryViewModel
     private lateinit var photoRecyclerView: RecyclerView
     private lateinit var thumbnailDownloader: ThumbnailDownloader<PhotoHolder>
+    private lateinit var loadingView: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +56,9 @@ class PhotoGalleryFragment : Fragment() {
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
         photoRecyclerView.layoutManager = GridLayoutManager(context, 3)
 
+        loadingView = view.findViewById(R.id.loading_linear_layout)
+
+
         return view
     }
 
@@ -59,6 +67,8 @@ class PhotoGalleryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         photoGalleryViewModel.galleryItemLiveData.observe(viewLifecycleOwner, { galleryItems ->
             photoRecyclerView.adapter = PhotoAdapter(galleryItems)
+            loadingView.visibility = View.INVISIBLE
+            photoRecyclerView.visibility = View.VISIBLE
 
         })
 
@@ -91,6 +101,13 @@ class PhotoGalleryFragment : Fragment() {
             setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String): Boolean {
                     photoGalleryViewModel.fetchPhotos(query)
+                    //这里做隐藏软键盘和显示状态搜索中
+                    val imm =
+                        requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(windowToken, 0)
+                    loadingView.visibility = View.VISIBLE
+                    photoRecyclerView.visibility = View.INVISIBLE
+
                     return true
                 }
 
